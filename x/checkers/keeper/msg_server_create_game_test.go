@@ -33,6 +33,7 @@ func TestCreateGame(t *testing.T) {
 
 func TestCreate1GameHasSaved(t *testing.T) {
 	msgSrvr, keeper, context := setupMsgServerCreateGame(t)
+	ctx := sdk.UnwrapSDKContext(context)
 	msgSrvr.CreateGame(context, &types.MsgCreateGame{
 		Creator: alice,
 		Black:   bob,
@@ -46,12 +47,13 @@ func TestCreate1GameHasSaved(t *testing.T) {
 	game1, found1 := keeper.GetStoredGame(sdk.UnwrapSDKContext(context), "1")
 	require.True(t, found1)
 	require.EqualValues(t, types.StoredGame{
-		Index:  "1",
-		Board:  "*b*b*b*b|b*b*b*b*|*b*b*b*b|********|********|r*r*r*r*|*r*r*r*r|r*r*r*r*",
-		Turn:   "b",
-		Black:  bob,
-		Red:    carol,
-		Winner: "*",
+		Index:    "1",
+		Board:    "*b*b*b*b|b*b*b*b*|*b*b*b*b|********|********|r*r*r*r*|*r*r*r*r|r*r*r*r*",
+		Turn:     "b",
+		Black:    bob,
+		Red:      carol,
+		Winner:   "*",
+		Deadline: types.FormatDeadline(ctx.BlockTime().Add(types.MaxTurnDuration)),
 	}, game1)
 }
 func TestCreate1GameEmitted(t *testing.T) {
